@@ -224,7 +224,7 @@ function Home() {
               Create Account
             </a>
             <a
-              href="#contact"
+              href="/contact"
               className="inline-flex items-center rounded-full border border-white/60 px-5 py-3 font-semibold text-slate-50 transition-colors hover:border-white"
             >
               Contact Us

@@ -6,6 +6,7 @@ const navItems = [
   { to: '/discover', label: 'Discover' },
   { to: '/awareness', label: 'POCSO Awareness' },
   { to: '/news', label: 'News' },
+  { to: '/contact', label: 'Contact' },
 ]
 
 function Navbar() {
@@ -35,24 +36,25 @@ function Navbar() {
               {item.label}
             </NavLink>
           ))}
-          {/* TODO: Replace placeholder contact link with real route when available */}
-          <a
-            href="#contact"
-            className="transition-colors duration-150 hover:text-primary"
-          >
-            Contact
-          </a>
         </nav>
-        <NavLink
-          to="/login"
-          className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-slate-900 transition-colors duration-150 hover:bg-emerald-400"
-        >
-          Login
-        </NavLink>
+        <div className="flex items-center gap-3">
+          <NavLink
+            to="/register"
+            className="rounded-full border border-accent px-4 py-2 text-sm font-semibold text-accent transition-colors duration-150 hover:bg-accent hover:text-slate-900"
+          >
+            Register
+          </NavLink>
+
+          <NavLink
+            to="/login"
+            className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-slate-900 transition-colors duration-150 hover:bg-emerald-400"
+          >
+            Login
+          </NavLink>
+        </div>
       </div>
     </header>
   )
 }
 
 export default Navbar
-

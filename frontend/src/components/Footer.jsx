@@ -4,7 +4,7 @@ const quickLinks = [
   { label: 'Discover', to: '/discover' },
   { label: 'POCSO Awareness', to: '/awareness' },
   { label: 'News', to: '/news' },
-  // TODO: Add real contact route when implemented
+  { label: 'Contact', to: '/contact' },
 ]
 
 function Footer() {
@@ -33,15 +33,6 @@ function Footer() {
                 </a>
               </li>
             ))}
-            <li>
-              {/* TODO: Replace placeholder contact anchor with actual route */}
-              <a
-                href="#contact"
-                className="transition-colors duration-150 hover:text-primary"
-              >
-                Contact
-              </a>
-            </li>
           </ul>
         </div>
         <div className="flex-1">
