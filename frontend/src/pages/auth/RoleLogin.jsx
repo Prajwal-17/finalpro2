@@ -48,13 +48,17 @@ function RoleLogin() {
         body: JSON.stringify(payload),
       })
 
+      // Store user info in localStorage
+      localStorage.setItem('userRole', role)
+      localStorage.setItem('userIdentifier', formState.identifier.trim())
+
       setStatus({
         type: 'success',
         message: 'Login successful. Redirecting…',
       })
 
       setTimeout(() => {
-        navigate('/home')
+        navigate('/dashboard')
       }, 900)
     } catch (error) {
       setStatus({
