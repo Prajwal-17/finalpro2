@@ -30,6 +30,12 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
+- load quiz catalog + mock dev data (safe to re-run, add `--purge` to replace existing records)
+
+```bash
+python manage.py seed_mock_data  # add --purge to wipe and reseed
+```
+
 - run development server
 
 ```bash

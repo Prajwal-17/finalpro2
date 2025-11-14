@@ -8,14 +8,17 @@ function TeacherProgress({ identifier }) {
 
   useEffect(() => {
     async function fetchProgress() {
+      setLoading(true)
+      setError(null)
       try {
         const data = await fetchJson(
           `/api/quiz/progress?role=teacher&identifier=${encodeURIComponent(identifier)}`
         )
-        setProgress(data)
+        setProgress(Array.isArray(data) ? data : [])
       } catch (err) {
         setError('Failed to load progress. Please try again.')
         console.error(err)
+        setProgress([])
       } finally {
         setLoading(false)
       }
@@ -66,7 +69,7 @@ function TeacherProgress({ identifier }) {
   const averageScore =
     progress.length > 0
       ? Math.round(
-          progress.reduce((sum, p) => sum + p.percentage, 0) / progress.length
+          progress.reduce((sum, p) => sum + (p.percentage ?? 0), 0) / progress.length
         )
       : 0
 
@@ -136,13 +139,13 @@ function TeacherProgress({ identifier }) {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs font-medium text-slate-300">Score</span>
                         <span className="text-sm font-bold text-slate-100">
-                          {item.score} / {item.totalQuestions} ({item.percentage}%)
+                          {item.score ?? 0} / {item.totalQuestions ?? 0} ({item.percentage ?? 0}%)
                         </span>
                       </div>
                       <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-amber-500 rounded-full transition-all"
-                          style={{ width: `${item.percentage}%` }}
+                          style={{ width: `${Math.max(0, Math.min(100, item.percentage ?? 0))}%` }}
                         ></div>
                       </div>
                     </div>

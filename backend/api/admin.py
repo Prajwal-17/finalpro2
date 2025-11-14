@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Article, LoginAttempt, RegistrationRequest
+from .models import Article, LoginAttempt, RegistrationRequest, Quiz, Question, QuizAttempt, QuestionResponse
 
 
 @admin.register(Article)
@@ -27,3 +27,7 @@ class LoginAttemptAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
 
 # Register your models here.
+admin.site.register(Quiz)
+admin.site.register(Question)
+admin.site.register(QuizAttempt)
+admin.site.register(QuestionResponse)

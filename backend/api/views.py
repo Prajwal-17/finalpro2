@@ -221,7 +221,7 @@ def quiz_detail(request, quiz_id):
 @csrf_exempt
 @require_POST
 def quiz_start(request):
-    """Start a new quiz attempt"""
+    """Start a new quiz attempt or return existing active attempt"""
     try:
         payload = json.loads(request.body or '{}')
     except json.JSONDecodeError:
@@ -247,11 +247,21 @@ def quiz_start(request):
             status=HTTPStatus.NOT_FOUND,
         )
 
-    attempt = QuizAttempt.objects.create(
+    # Check for existing active attempt (not completed)
+    existing_attempt = QuizAttempt.objects.filter(
         child_email=child_email,
         quiz=quiz,
-        total_questions=quiz.questions.count(),
-    )
+        is_completed=False
+    ).first()
+
+    if existing_attempt:
+        attempt = existing_attempt
+    else:
+        attempt = QuizAttempt.objects.create(
+            child_email=child_email,
+            quiz=quiz,
+            total_questions=quiz.questions.count(),
+        )
 
     return JsonResponse({
         'attemptId': attempt.id,

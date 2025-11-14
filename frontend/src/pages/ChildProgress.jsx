@@ -8,14 +8,17 @@ function ChildProgress({ identifier }) {
 
   useEffect(() => {
     async function fetchProgress() {
+      setLoading(true)
+      setError(null)
       try {
         const data = await fetchJson(
           `/api/quiz/progress?role=child&identifier=${encodeURIComponent(identifier)}`
         )
-        setProgress(data)
+        setProgress(Array.isArray(data) ? data : [])
       } catch (err) {
         setError('Failed to load progress. Please try again.')
         console.error(err)
+        setProgress([])
       } finally {
         setLoading(false)
       }
@@ -78,23 +81,25 @@ function ChildProgress({ identifier }) {
             </span>
           </div>
 
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-300">Score</span>
-              <span className="text-lg font-bold text-slate-100">
-                {item.score} / {item.totalQuestions}
-              </span>
+          {!loading && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-slate-300">Score</span>
+                <span className="text-lg font-bold text-slate-100">
+                  {item.score ?? 0} / {item.totalQuestions ?? 0}
+                </span>
+              </div>
+              <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full transition-all"
+                  style={{ width: `${Math.max(0, Math.min(100, item.percentage ?? 0))}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-slate-400 mt-2">
+                {item.percentage ?? 0}% correct
+              </p>
             </div>
-            <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all"
-                style={{ width: `${item.percentage}%` }}
-              ></div>
-            </div>
-            <p className="text-sm text-slate-400 mt-2">
-              {item.percentage}% correct
-            </p>
-          </div>
+          )}
 
           <div className="text-xs text-slate-500">
             Started: {new Date(item.startedAt).toLocaleString()}

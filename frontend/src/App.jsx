@@ -11,6 +11,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import News from './pages/News'
 import Register from './pages/Register'
+import Contact from './pages/Contact'
 
 function App() {
   const location = useLocation()
@@ -27,6 +28,7 @@ function App() {
           <Route path="/discover" element={<Discover />} />
           <Route path="/awareness" element={<Awareness />} />
           <Route path="/news" element={<News />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login/:role" element={<RoleLogin />} />
           <Route path="/register" element={<Register />} />
