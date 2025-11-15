@@ -8,12 +8,13 @@ function ParentProgress({ identifier }) {
   const [activeChildEmail, setActiveChildEmail] = useState('')
   const [lookupEmail, setLookupEmail] = useState('')
 
-  // Pre-fill the lookup input with whatever identifier parent used at login,
-  // and also set the activeChildEmail to automatically fetch progress.
+  // Pre-fill the lookup input with whatever identifier parent used at login
+  // Note: Parent identifier is their own email, not the child's email
+  // They need to enter the child's email to view progress
   useEffect(() => {
     if (identifier && !lookupEmail) {
-      setLookupEmail(identifier)
-      setActiveChildEmail(identifier)  // <-- Added this line for auto-fetch
+      // Don't auto-fetch - parent needs to enter child email
+      // Just show a helpful message
     }
   }, [identifier, lookupEmail])
 
@@ -31,10 +32,19 @@ function ParentProgress({ identifier }) {
         const data = await fetchJson(
           `/api/quiz/progress?role=parent&identifier=${encodeURIComponent(activeChildEmail)}`
         )
-        setProgress(Array.isArray(data) ? data : [])
+        console.log('Progress data received:', data)
+        if (Array.isArray(data)) {
+          setProgress(data)
+          if (data.length === 0) {
+            console.log('No progress found for:', activeChildEmail)
+          }
+        } else {
+          console.error('Invalid data format:', data)
+          setProgress([])
+        }
       } catch (err) {
-        setError('Failed to load progress. Please try again.')
-        console.error(err)
+        console.error('Error fetching progress:', err)
+        setError(`Failed to load progress: ${err.message || 'Please try again.'}`)
         setProgress([])
       } finally {
         setLoading(false)
@@ -62,12 +72,20 @@ function ParentProgress({ identifier }) {
 
   // Group by child email (if multiple children in future)
   const groupedByChild = progress.reduce((acc, item) => {
-    if (!acc[item.childEmail]) {
-      acc[item.childEmail] = []
+    if (item && item.childEmail) {
+      if (!acc[item.childEmail]) {
+        acc[item.childEmail] = []
+      }
+      acc[item.childEmail].push(item)
     }
-    acc[item.childEmail].push(item)
     return acc
   }, {})
+  
+  // Debug: Log grouped data
+  if (progress.length > 0) {
+    console.log('Grouped progress:', groupedByChild)
+    console.log('Progress items:', progress)
+  }
 
   return (
     <div className="space-y-6">
@@ -130,18 +148,21 @@ function ParentProgress({ identifier }) {
         </div>
       )}
 
-      {!loading && activeChildEmail && progress.length === 0 && (
+      {!loading && activeChildEmail && (progress.length === 0 || Object.keys(groupedByChild).length === 0) && (
         <div className="rounded-lg bg-slate-800 p-8 text-center">
           <p className="text-slate-400 mb-4">
             No quiz attempts found for {activeChildEmail}.
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 mb-2">
             Encourage them to start their first quiz!
+          </p>
+          <p className="text-xs text-slate-600 mt-4">
+            Tip: Try using a child email like <code className="text-slate-400">mia.rao@example.com</code> or <code className="text-slate-400">vivaan.singh@example.com</code> if you have seeded data.
           </p>
         </div>
       )}
 
-      {!loading && activeChildEmail && progress.length > 0 && (
+      {!loading && activeChildEmail && progress.length > 0 && Object.keys(groupedByChild).length > 0 && (
         <div className="space-y-8">
           {Object.entries(groupedByChild).map(([email, items]) => (
             <div key={email}>

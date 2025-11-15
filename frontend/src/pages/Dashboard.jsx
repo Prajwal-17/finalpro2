@@ -5,16 +5,22 @@ import Quiz from './Quiz'
 import ChildProgress from './ChildProgress'
 import ParentProgress from './ParentProgress'
 import TeacherProgress from './TeacherProgress'
+import Chat from '../components/Chat'
+import SOSButton from '../components/SOSButton'
+import { useSOSWebSocket } from '../hooks/useSOSWebSocket'
+import axios from 'axios'
 
 function Dashboard() {
   const navigate = useNavigate()
   const [role, setRole] = useState(null)
   const [identifier, setIdentifier] = useState(null)
+  const [token, setToken] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole')
     const storedIdentifier = localStorage.getItem('userIdentifier')
+    const storedToken = localStorage.getItem('chatToken') // Token from Node.js auth
 
     if (!storedRole || !storedIdentifier) {
       navigate('/login')
@@ -23,6 +29,7 @@ function Dashboard() {
 
     setRole(storedRole)
     setIdentifier(storedIdentifier)
+    setToken(storedToken) // May be null if not logged into chat system
     setLoading(false)
   }, [navigate])
 
@@ -67,22 +74,48 @@ function Dashboard() {
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {role === 'child' && (
-          <ChildDashboard identifier={identifier} />
+          <ChildDashboard identifier={identifier} token={token} />
         )}
         {role === 'parent' && (
-          <ParentDashboard identifier={identifier} />
+          <ParentDashboard identifier={identifier} token={token} />
         )}
         {role === 'teacher' && (
-          <TeacherDashboard identifier={identifier} />
+          <TeacherDashboard identifier={identifier} token={token} />
         )}
       </div>
     </div>
   )
 }
 
-function ChildDashboard({ identifier }) {
-  const [view, setView] = useState('quiz') // 'quiz' or 'progress'
+function ChildDashboard({ identifier, token }) {
+  const [view, setView] = useState('chat') // 'chat', 'quiz', or 'progress'
   const [selectedQuizId, setSelectedQuizId] = useState(null)
+  const [chatToken, setChatToken] = useState(token)
+  const [loadingChat, setLoadingChat] = useState(false)
+
+  // Auto-authenticate when chat view is opened
+  useEffect(() => {
+    if (view === 'chat' && !chatToken && !loadingChat) {
+      setLoadingChat(true)
+      // Auto-login using identifier from Django session
+      axios.post('http://localhost:5001/api/auth/auto-login', {
+        identifier: identifier,
+        role: 'child',
+        email: identifier,
+        fullName: identifier.split('@')[0] // Use email prefix as name
+      })
+      .then(response => {
+        const token = response.data.token
+        setChatToken(token)
+        localStorage.setItem('chatToken', token)
+        setLoadingChat(false)
+      })
+      .catch(error => {
+        console.error('Auto-login failed:', error)
+        setLoadingChat(false)
+      })
+    }
+  }, [view, chatToken, loadingChat, identifier])
 
   if (selectedQuizId) {
     return (
@@ -95,8 +128,18 @@ function ChildDashboard({ identifier }) {
   }
 
   return (
-    <div>
+    <div className="relative">
       <div className="mb-6 flex gap-4">
+        <button
+          onClick={() => setView('chat')}
+          className={`rounded-lg px-6 py-3 font-semibold transition-colors ${
+            view === 'chat'
+              ? 'bg-primary text-slate-950'
+              : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
+          }`}
+        >
+          💬 Talk to Sparkle
+        </button>
         <button
           onClick={() => setView('quiz')}
           className={`rounded-lg px-6 py-3 font-semibold transition-colors ${
@@ -119,34 +162,193 @@ function ChildDashboard({ identifier }) {
         </button>
       </div>
 
+      {view === 'chat' && (
+        <div className="h-[600px] rounded-2xl border border-slate-800 overflow-hidden">
+          {loadingChat ? (
+            <div className="h-full flex items-center justify-center bg-slate-900/50">
+              <div className="text-center">
+                <div className="text-6xl mb-4 animate-pulse">✨</div>
+                <p className="text-slate-300 mb-2 text-lg">Loading Sparkle...</p>
+                <p className="text-slate-400 text-sm">Setting up your chat</p>
+              </div>
+            </div>
+          ) : chatToken ? (
+            <Chat token={chatToken} />
+          ) : (
+            <div className="h-full flex items-center justify-center bg-slate-900/50">
+              <div className="text-center">
+                <div className="text-6xl mb-4">✨</div>
+                <p className="text-slate-300 mb-2 text-lg">Welcome to Sparkle!</p>
+                <p className="text-slate-400 text-sm">Initializing chat...</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {view === 'quiz' && (
         <QuizList onSelectQuiz={setSelectedQuizId} />
       )}
       {view === 'progress' && (
         <ChildProgress identifier={identifier} />
       )}
+
+      {/* SOS Button - Always visible for children */}
+      {chatToken && <SOSButton token={chatToken} />}
     </div>
   )
 }
 
-function ParentDashboard({ identifier }) {
+function ParentDashboard({ identifier, token }) {
+  const [sosAlert, setSosAlert] = useState(null)
+  const [chatToken, setChatToken] = useState(token)
+  const [loadingChat, setLoadingChat] = useState(false)
+
+  // Auto-authenticate for parents/teachers
+  useEffect(() => {
+    if (!chatToken && !loadingChat) {
+      setLoadingChat(true)
+      axios.post('http://localhost:5001/api/auth/auto-login', {
+        identifier: identifier,
+        role: 'parent',
+        email: identifier,
+        fullName: identifier.split('@')[0]
+      })
+      .then(response => {
+        const token = response.data.token
+        setChatToken(token)
+        localStorage.setItem('chatToken', token)
+        setLoadingChat(false)
+      })
+      .catch(error => {
+        console.error('Auto-login failed:', error)
+        setLoadingChat(false)
+      })
+    }
+  }, [chatToken, loadingChat, identifier])
+
+  const handleSOSAlert = (alert) => {
+    setSosAlert(alert)
+    // Play alert sound
+    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OSdTQ8OUKjj8LZjHAY4kdfyzHksBSR3x/DdkEAKFF606euoVRQKRp/g8r5sIQUrgc7y2Yk2CBtpvfDknU0PDlCo4/C2YxwGOJHX8sx5LAUkd8fw3ZBAC');
+    audio.play().catch(() => {})
+  }
+
+  // Listen for SOS alerts via WebSocket
+  useSOSWebSocket(chatToken, handleSOSAlert)
+
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-slate-100">
         Your Child's Progress
       </h2>
       <ParentProgress identifier={identifier} />
+      
+      {/* SOS Alert Modal */}
+      {sosAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          <div className="bg-red-900 rounded-2xl border-4 border-red-600 p-8 max-w-lg mx-4 shadow-2xl animate-pulse">
+            <div className="text-center">
+              <div className="text-7xl mb-4 animate-bounce">🆘</div>
+              <h3 className="text-3xl font-bold text-white mb-2">
+                SOS ALERT!
+              </h3>
+              <p className="text-red-100 mb-4 text-lg">
+                {sosAlert.child.fullName || sosAlert.child.username} needs immediate help!
+              </p>
+              <p className="text-red-200 mb-6">
+                {sosAlert.message}
+              </p>
+              <p className="text-sm text-red-300 mb-6">
+                Time: {new Date(sosAlert.timestamp).toLocaleString()}
+              </p>
+              <button
+                onClick={() => setSosAlert(null)}
+                className="px-8 py-3 rounded-lg bg-white text-red-600 font-bold text-lg hover:bg-red-50 transition-colors"
+              >
+                Acknowledge Alert
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-function TeacherDashboard({ identifier }) {
+function TeacherDashboard({ identifier, token }) {
+  const [sosAlert, setSosAlert] = useState(null)
+  const [chatToken, setChatToken] = useState(token)
+  const [loadingChat, setLoadingChat] = useState(false)
+
+  // Auto-authenticate for teachers
+  useEffect(() => {
+    if (!chatToken && !loadingChat) {
+      setLoadingChat(true)
+      axios.post('http://localhost:5001/api/auth/auto-login', {
+        identifier: identifier,
+        role: 'teacher',
+        email: identifier,
+        fullName: identifier.split('@')[0]
+      })
+      .then(response => {
+        const token = response.data.token
+        setChatToken(token)
+        localStorage.setItem('chatToken', token)
+        setLoadingChat(false)
+      })
+      .catch(error => {
+        console.error('Auto-login failed:', error)
+        setLoadingChat(false)
+      })
+    }
+  }, [chatToken, loadingChat, identifier])
+
+  const handleSOSAlert = (alert) => {
+    setSosAlert(alert)
+    // Play alert sound
+    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OSdTQ8OUKjj8LZjHAY4kdfyzHksBSR3x/DdkEAKFF606euoVRQKRp/g8r5sIQUrgc7y2Yk2CBtpvfDknU0PDlCo4/C2YxwGOJHX8sx5LAUkd8fw3ZBAC');
+    audio.play().catch(() => {})
+  }
+
+  // Listen for SOS alerts via WebSocket
+  useSOSWebSocket(chatToken, handleSOSAlert)
+
   return (
     <div>
       <h2 className="mb-6 text-3xl font-bold text-slate-100">
         All Students' Progress
       </h2>
       <TeacherProgress identifier={identifier} />
+      
+      {/* SOS Alert Modal */}
+      {sosAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          <div className="bg-red-900 rounded-2xl border-4 border-red-600 p-8 max-w-lg mx-4 shadow-2xl animate-pulse">
+            <div className="text-center">
+              <div className="text-7xl mb-4 animate-bounce">🆘</div>
+              <h3 className="text-3xl font-bold text-white mb-2">
+                SOS ALERT!
+              </h3>
+              <p className="text-red-100 mb-4 text-lg">
+                {sosAlert.child.fullName || sosAlert.child.username} needs immediate help!
+              </p>
+              <p className="text-red-200 mb-6">
+                {sosAlert.message}
+              </p>
+              <p className="text-sm text-red-300 mb-6">
+                Time: {new Date(sosAlert.timestamp).toLocaleString()}
+              </p>
+              <button
+                onClick={() => setSosAlert(null)}
+                className="px-8 py-3 rounded-lg bg-white text-red-600 font-bold text-lg hover:bg-red-50 transition-colors"
+              >
+                Acknowledge Alert
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
