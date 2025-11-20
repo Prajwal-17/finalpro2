@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
@@ -10,6 +11,30 @@ const navItems = [
 ]
 
 function Navbar() {
+  const [userRole, setUserRole] = useState(null)
+
+  useEffect(() => {
+    const role = localStorage.getItem('userRole')
+    setUserRole(role)
+
+    // Listen for storage changes (e.g., when user logs in)
+    const handleStorageChange = () => {
+      const newRole = localStorage.getItem('userRole')
+      setUserRole(newRole)
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    // Also listen for custom event in case storage event doesn't fire (same tab)
+    window.addEventListener('userRoleChanged', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('userRoleChanged', handleStorageChange)
+    }
+  }, [])
+
+  const isParentOrTeacher = userRole === 'parent' || userRole === 'teacher'
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -36,6 +61,21 @@ function Navbar() {
               {item.label}
             </NavLink>
           ))}
+          {isParentOrTeacher && (
+            <NavLink
+              to="/legal-aid"
+              className={({ isActive }) =>
+                [
+                  'transition-colors duration-150 hover:text-primary',
+                  isActive ? 'text-primary' : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(' ')
+              }
+            >
+              Legal Aid
+            </NavLink>
+          )}
         </nav>
         <div className="flex items-center gap-3">
           <NavLink

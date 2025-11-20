@@ -8,6 +8,7 @@ import Awareness from './pages/Awareness'
 import Dashboard from './pages/Dashboard'
 import Discover from './pages/Discover'
 import Home from './pages/Home'
+import LegalAid from './pages/LegalAid'
 import Login from './pages/Login'
 import News from './pages/News'
 import Register from './pages/Register'
@@ -29,6 +30,7 @@ function App() {
           <Route path="/awareness" element={<Awareness />} />
           <Route path="/news" element={<News />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/legal-aid" element={<LegalAid />} />
           <Route path="/login" element={<Login />} />
           <Route path="/login/:role" element={<RoleLogin />} />
           <Route path="/register" element={<Register />} />

@@ -9,10 +9,10 @@ const features = [
     icon: '🛡️',
   },
   {
-    title: 'Gamified Learning',
+    title: 'Progress Tracking',
     description:
-      'Level-based quizzes with badges, rewards, and progress tracking to keep kids engaged.',
-    icon: '🎮',
+      'Comprehensive progress monitoring with detailed analytics and personalized learning insights.',
+    icon: '📈',
   },
   {
     title: 'AI Chatbot',
@@ -102,7 +102,7 @@ function Home() {
               Protect Every Child
             </span>
             <h1 className="text-4xl font-bold leading-tight text-slate-100 md:text-5xl">
-              Comprehensive safety awareness, gamified learning, and emotional
+              Comprehensive safety awareness and emotional
               support for a safer tomorrow.
             </h1>
             <p className="text-slate-400">
@@ -134,7 +134,7 @@ function Home() {
               alerts ensure every child feels heard and protected.
             </p>
             <ul className="mt-8 space-y-4 text-sm text-slate-300">
-              <li>• Adaptive learning pathways for different age groups</li>
+              <li>• Adaptive pathways for different age groups</li>
               <li>• SOS access with geo-aware helplines</li>
               <li>• Parent &amp; teacher dashboards for oversight</li>
             </ul>
