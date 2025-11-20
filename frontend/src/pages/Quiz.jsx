@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import fetchJson from '../lib/fetchJson'
 
 function Quiz({ quizId, childEmail, onBack }) {
@@ -14,8 +14,27 @@ function Quiz({ quizId, childEmail, onBack }) {
   const [error, setError] = useState(null)
   const [isCameraOn, setIsCameraOn] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const hasStartedRef = useRef(null) // Track which quiz/child combination has been started
 
   useEffect(() => {
+    // Create a unique key for this quiz/child combination
+    const quizKey = `${quizId}-${childEmail}`
+    
+    // Prevent multiple calls for the same quiz/child combination
+    if (hasStartedRef.current === quizKey) return
+    hasStartedRef.current = quizKey
+
+    // Reset state when starting a new quiz
+    setQuizData(null)
+    setAttemptId(null)
+    setCurrentQuestionIndex(0)
+    setScore(0)
+    setHasAnswered(false)
+    setSelectedAnswer(null)
+    setIsCompleted(false)
+    setLoading(true)
+    setError(null)
+
     async function loadQuiz() {
       try {
         const data = await fetchJson(`/api/quiz/${quizId}`)

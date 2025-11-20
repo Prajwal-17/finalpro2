@@ -1,14 +1,14 @@
+import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import fetchJson from '../lib/fetchJson'
-import Quiz from './Quiz'
-import ChildProgress from './ChildProgress'
-import ParentProgress from './ParentProgress'
-import TeacherProgress from './TeacherProgress'
 import Chat from '../components/Chat'
 import SOSButton from '../components/SOSButton'
 import { useSOSWebSocket } from '../hooks/useSOSWebSocket'
-import axios from 'axios'
+import fetchJson from '../lib/fetchJson'
+import ChildProgress from './ChildProgress'
+import ParentProgress from './ParentProgress'
+import Quiz from './Quiz'
+import TeacherProgress from './TeacherProgress'
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -115,7 +115,7 @@ function ChildDashboard({ identifier, token }) {
         setLoadingChat(false)
       })
     }
-  }, [view, chatToken, loadingChat, identifier])
+  }, [view, identifier]) // Removed chatToken and loadingChat from dependencies to prevent infinite loop
 
   if (selectedQuizId) {
     return (
@@ -225,7 +225,7 @@ function ParentDashboard({ identifier, token }) {
         setLoadingChat(false)
       })
     }
-  }, [chatToken, loadingChat, identifier])
+  }, [identifier]) // Removed chatToken and loadingChat from dependencies to prevent infinite loop
 
   const handleSOSAlert = (alert) => {
     setSosAlert(alert)
@@ -302,7 +302,7 @@ function TeacherDashboard({ identifier, token }) {
         setLoadingChat(false)
       })
     }
-  }, [chatToken, loadingChat, identifier])
+  }, [identifier]) // Removed chatToken and loadingChat from dependencies to prevent infinite loop
 
   const handleSOSAlert = (alert) => {
     setSosAlert(alert)
