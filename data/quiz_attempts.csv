@@ -1,0 +1,11 @@
+child_email,quiz_level,answered_questions,correct_answers,mark_completed
+mia.rao@example.com,1,5,4,true
+mia.rao@example.com,2,3,2,false
+vivaan.singh@example.com,1,5,5,true
+vivaan.singh@example.com,3,5,2,true
+arjun.kumar@example.com,1,5,3,true
+arjun.kumar@example.com,2,4,3,false
+ananya.sharma@example.com,1,5,5,true
+ananya.sharma@example.com,2,5,4,true
+emma.johnson@example.com,1,3,2,false
+

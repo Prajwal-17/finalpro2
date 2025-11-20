@@ -1,0 +1,10 @@
+role,is_successful,identifier,device,appVersion,ip
+parent,true,aarav.rao@example.com,ios,1.0.0,
+teacher,true,kiran.gupta@example.com,web,,122.18.1.44
+child,true,mia.rao@example.com,android,0.9.2,
+parent,true,sarah.mathews@example.com,web,,192.168.1.1
+child,true,vivaan.singh@example.com,ios,1.0.1,
+teacher,true,anjali.patel@example.com,web,,10.0.0.5
+parent,true,rajesh.kumar@example.com,android,1.0.0,
+child,true,arjun.kumar@example.com,ios,0.9.5,
+

@@ -1,0 +1,159 @@
+[
+  {
+    "level": 1,
+    "title": "Level 1: Good Touch, Bad Touch",
+    "badgeName": "Awareness Star",
+    "questions": [
+      {
+        "q": "Which of these is an example of a safe/good touch?",
+        "options": [
+          "A high-five from a teacher after doing well in a test.",
+          "Someone touching your private parts.",
+          "Someone you don't know hugging you tightly."
+        ],
+        "correct": "A high-five from a teacher after doing well in a test."
+      },
+      {
+        "q": "Which parts of your body are considered private and should not be touched by others without your permission (except for necessary reasons like a doctor with a parent present)?",
+        "options": [
+          "Arms and Legs.",
+          "Mouth, chest, between the legs, and bottom.",
+          "Head and Shoulders."
+        ],
+        "correct": "Mouth, chest, between the legs, and bottom."
+      },
+      {
+        "q": "What is a common way to know if a touch is unsafe/bad?",
+        "options": [
+          "The person gives you a gift afterwards.",
+          "It makes you feel confused, scared, uncomfortable, or wrong.",
+          "The touch is done in a public place."
+        ],
+        "correct": "It makes you feel confused, scared, uncomfortable, or wrong."
+      },
+      {
+        "q": "If someone tells you to keep a secret about something that makes you uncomfortable, what should you do?",
+        "options": [
+          "Keep the secret so you don't make them angry.",
+          "Tell a trusted adult right away, even if the person said not to.",
+          "Tell the person you will keep the secret but tell all your friends."
+        ],
+        "correct": "Tell a trusted adult right away, even if the person said not to."
+      },
+      {
+        "q": "Who are the trusted adults you can talk to about unsafe touches?",
+        "options": [
+          "Only strangers who offer help.",
+          "Parents/Guardians, Grandparents, Older Siblings, School Teachers, or other family members you feel safe with.",
+          "Only the person who is giving the unsafe touch."
+        ],
+        "correct": "Parents/Guardians, Grandparents, Older Siblings, School Teachers, or other family members you feel safe with."
+      }
+    ]
+  },
+  {
+    "level": 2,
+    "title": "Level 2: Spotting Red Flags",
+    "badgeName": "Red Flag Recognizer",
+    "questions": [
+      {
+        "q": "Have you ever been asked by an adult to do something that felt wrong or confusing?",
+        "options": [
+          "Yes, and it made me feel uncomfortable.",
+          "No, everything always feels right.",
+          "Only if it was one of my friends."
+        ],
+        "correct": "Yes, and it made me feel uncomfortable."
+      },
+      {
+        "q": "Has anyone ever shown you pictures or videos that are private or sexual and told you not to tell anyone?",
+        "options": [
+          "Yes, but it was just a joke, so it's okay.",
+          "No, never.",
+          "Yes, and it made me feel uneasy."
+        ],
+        "correct": "Yes, and it made me feel uneasy."
+      },
+      {
+        "q": "Have you ever been threatened or made to feel bad if you didn't agree to do what an adult was asking?",
+        "options": [
+          "Yes, and I felt scared.",
+          "No, adults never threaten me.",
+          "Yes, but they were just playing, so it was fine."
+        ],
+        "correct": "Yes, and I felt scared."
+      },
+      {
+        "q": "If someone gives you a gift or money and asks you to keep a secret about a touch, how does that make the situation feel?",
+        "options": [
+          "It makes the secret safe and worth keeping.",
+          "It makes the touch feel more like an unsafe/bad touch because they are trying to hide it.",
+          "It means the person is just being kind."
+        ],
+        "correct": "It makes the touch feel more like an unsafe/bad touch because they are trying to hide it."
+      },
+      {
+        "q": "Have you ever seen someone else (another child) being touched or treated in a way that made them look scared or uncomfortable?",
+        "options": [
+          "No, I haven't noticed.",
+          "Yes, and I knew it was wrong.",
+          "Yes, but it's not my business to worry about."
+        ],
+        "correct": "Yes, and I knew it was wrong."
+      }
+    ]
+  },
+  {
+    "level": 3,
+    "title": "Level 3: Power to Protect",
+    "badgeName": "Safety Champion",
+    "questions": [
+      {
+        "q": "What is the National Child Helpline Number that you can call for help and support?",
+        "options": [
+          "100",
+          "1098",
+          "101"
+        ],
+        "correct": "1098"
+      },
+      {
+        "q": "Who is the most important person to tell immediately if you have been subjected to an unsafe touch or activity?",
+        "options": [
+          "The person who did the activity.",
+          "A trusted adult like a parent, guardian, or teacher.",
+          "Your pet."
+        ],
+        "correct": "A trusted adult like a parent, guardian, or teacher."
+      },
+      {
+        "q": "According to the POCSO Act, if a teacher, doctor, or any adult knows that a child is being abused, are they legally required to report it to the authorities?",
+        "options": [
+          "No, it's optional and depends on the child's feelings.",
+          "Yes, they have a mandatory duty to report it to the police or authorities.",
+          "Only if the child gives them permission."
+        ],
+        "correct": "Yes, they have a mandatory duty to report it to the police or authorities."
+      },
+      {
+        "q": "If you can't tell your parents, which official authority should a trusted adult (like a school principal) report the crime to?",
+        "options": [
+          "The Fire Department.",
+          "The local police or the Special Juvenile Police Unit (SJPU).",
+          "The bank manager."
+        ],
+        "correct": "The local police or the Special Juvenile Police Unit (SJPU)."
+      },
+      {
+        "q": "What is the most important thing to remember after reporting an unsafe activity?",
+        "options": [
+          "You must never talk about it again.",
+          "It is not your fault, and you did the right thing by telling someone.",
+          "You will be in trouble for making a fuss."
+        ],
+        "correct": "It is not your fault, and you did the right thing by telling someone."
+      }
+    ]
+  }
+]
+

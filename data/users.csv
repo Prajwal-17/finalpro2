@@ -1,0 +1,17 @@
+role,full_name,email,password,childEmail,city,preferredLanguage,school,gradeRange,organization,region
+parent,Aarav Rao,aarav.rao@example.com,parents-rule,mia.rao@example.com,Bengaluru,en-IN,,,,
+parent,Sarah Mathews,sarah.mathews@example.com,shield360,vivaan.singh@example.com,Hyderabad,en-IN,,,,
+parent,Rajesh Kumar,rajesh.kumar@example.com,parent123,arjun.kumar@example.com,Mumbai,en-IN,,,,
+parent,Priya Sharma,priya.sharma@example.com,secure2024,ananya.sharma@example.com,Delhi,en-IN,,,,
+parent,David Johnson,david.johnson@example.com,family123,emma.johnson@example.com,Chennai,en-IN,,,,
+teacher,Mr. Kiran Gupta,kiran.gupta@example.com,teach-safe,,,en-IN,Rainbow Public School,4-6,,
+teacher,Ms. Anjali Patel,anjali.patel@example.com,teacher123,,,en-IN,Sunshine Elementary,1-3,,
+teacher,Mr. Ramesh Iyer,ramesh.iyer@example.com,educate2024,,,en-IN,Green Valley School,5-7,,
+counselor,Dr. Nisha Fernandes,nisha.fernandes@example.com,counsel-care,,,,,Safe Steps NGO,Karnataka
+counselor,Dr. Amit Verma,amit.verma@example.com,help123,,,,,,Child Safety Foundation,Delhi
+child,Mia Rao,mia.rao@example.com,child123,,,,,,,
+child,Vivaan Singh,vivaan.singh@example.com,kid2024,,,,,,,
+child,Arjun Kumar,arjun.kumar@example.com,secure123,,,,,,,
+child,Ananya Sharma,ananya.sharma@example.com,safe2024,,,,,,,
+child,Emma Johnson,emma.johnson@example.com,child123,,,,,,,
+
