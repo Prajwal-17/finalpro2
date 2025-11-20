@@ -448,3 +448,149 @@ def quiz_progress(request):
         status=HTTPStatus.BAD_REQUEST,
     )
 
+
+@csrf_exempt
+@require_POST
+def chat_send(request):
+    """Handle chat messages with Gemini AI for POSCO awareness"""
+    try:
+        payload = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {'error': 'Invalid JSON payload.'},
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    message = (payload.get('message') or '').strip()
+    if not message:
+        return JsonResponse(
+            {'error': 'message is required.'},
+            status=HTTPStatus.BAD_REQUEST,
+        )
+
+    # Import Gemini
+    try:
+        import google.generativeai as genai
+        from django.conf import settings
+    except ImportError:
+        return JsonResponse(
+            {'error': 'Gemini SDK not installed. Please install google-generativeai.'},
+            status=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+
+    # Check if API key is configured
+    api_key = settings.GEMINI_API_KEY
+    if not api_key or api_key == 'your-gemini-api-key-here':
+        return JsonResponse(
+            {'error': 'Gemini API key not configured. Please set GEMINI_API_KEY in .env file.'},
+            status=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+
+    # Configure Gemini
+    genai.configure(api_key=api_key)
+    model_name = settings.GEMINI_MODEL
+    
+    # Use correct model name format
+    if not model_name.startswith('models/'):
+        model_name = f'models/{model_name}'
+
+    # POSCO awareness system prompt
+    system_prompt = """You are Sparkle, a friendly AI assistant for POSCO awareness. Keep responses short and clear. Help children understand child safety, safe/unsafe touch, and POSCO Act basics. If someone feels unsafe, encourage them to use SOS or talk to a trusted adult."""
+
+    try:
+        # Initialize the model - try different model names if needed
+        try:
+            model = genai.GenerativeModel(model_name)
+        except Exception:
+            # Fallback to gemini-pro if flash doesn't work
+            model = genai.GenerativeModel('models/gemini-pro')
+        
+        # Create the conversation with system prompt
+        full_prompt = f"{system_prompt}\n\nUser: {message}\n\nSparkle:"
+        
+        # Generate response
+        response = model.generate_content(
+            full_prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                top_p=0.8,
+                top_k=40,
+                max_output_tokens=1024,
+            )
+        )
+
+        ai_response = response.text.strip()
+
+        # Simple emotion detection based on keywords (matching frontend logic)
+        def detect_emotion(text):
+            """Detect emotion from text"""
+            lower_text = text.lower()
+            safety_keywords = [
+                'abuse', 'hurt', 'unsafe', 'danger', 'dangerous', 'threat',
+                'scared', 'afraid', 'touch', 'private', 'sex', 'sexual',
+                'harm', 'pain', 'kill', 'suicide'
+            ]
+            negative_keywords = [
+                'sad', 'scared', 'afraid', 'hurt', 'pain', 'cry', 'crying',
+                'hate', 'angry', 'mad', 'frustrated', 'worried', 'anxious',
+                'lonely', 'alone', 'bad', 'terrible', 'awful', 'horrible'
+            ]
+            
+            safety_count = sum(1 for keyword in safety_keywords if keyword in lower_text)
+            negative_count = sum(1 for keyword in negative_keywords if keyword in lower_text)
+            
+            if safety_count > 0:
+                return {
+                    'emotion': 'concerned',
+                    'level': min(safety_count * 2, 10),
+                    'hasSafetyConcern': True
+                }
+            elif negative_count > 2:
+                return {
+                    'emotion': 'negative',
+                    'level': min(negative_count, 10),
+                    'hasSafetyConcern': False
+                }
+            elif negative_count > 0:
+                return {
+                    'emotion': 'slightly_negative',
+                    'level': negative_count,
+                    'hasSafetyConcern': False
+                }
+            
+            return {
+                'emotion': 'neutral',
+                'level': 0,
+                'hasSafetyConcern': False
+            }
+
+        detected_emotion = detect_emotion(message)
+
+        return JsonResponse({
+            'response': ai_response,
+            'detectedEmotion': detected_emotion,
+            'hasSafetyConcern': detected_emotion.get('hasSafetyConcern', False),
+        })
+
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        print(f"Gemini API Error: {error_msg}")
+        print(traceback.format_exc())
+        
+        # Provide more helpful error messages
+        if 'API key' in error_msg or 'authentication' in error_msg.lower():
+            error_msg = 'Gemini API key is invalid or missing. Please check your .env file.'
+        elif '404' in error_msg or 'not found' in error_msg.lower():
+            error_msg = 'Gemini model not found. Please check GEMINI_MODEL in settings.'
+        elif 'quota' in error_msg.lower() or 'limit' in error_msg.lower():
+            error_msg = 'Gemini API quota exceeded. Please check your API usage.'
+        
+        return JsonResponse(
+            {
+                'error': error_msg,
+                'details': traceback.format_exc() if settings.DEBUG else None
+            },
+            status=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
+

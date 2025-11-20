@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import Chat from '../components/Chat'
@@ -90,32 +89,8 @@ function Dashboard() {
 function ChildDashboard({ identifier, token }) {
   const [view, setView] = useState('chat') // 'chat', 'quiz', or 'progress'
   const [selectedQuizId, setSelectedQuizId] = useState(null)
-  const [chatToken, setChatToken] = useState(token)
-  const [loadingChat, setLoadingChat] = useState(false)
-
-  // Auto-authenticate when chat view is opened
-  useEffect(() => {
-    if (view === 'chat' && !chatToken && !loadingChat) {
-      setLoadingChat(true)
-      // Auto-login using identifier from Django session
-      axios.post('http://localhost:5001/api/auth/auto-login', {
-        identifier: identifier,
-        role: 'child',
-        email: identifier,
-        fullName: identifier.split('@')[0] // Use email prefix as name
-      })
-      .then(response => {
-        const token = response.data.token
-        setChatToken(token)
-        localStorage.setItem('chatToken', token)
-        setLoadingChat(false)
-      })
-      .catch(error => {
-        console.error('Auto-login failed:', error)
-        setLoadingChat(false)
-      })
-    }
-  }, [view, identifier]) // Removed chatToken and loadingChat from dependencies to prevent infinite loop
+  // Chat no longer requires authentication - token is optional
+  const chatToken = token || null
 
   if (selectedQuizId) {
     return (
@@ -164,25 +139,7 @@ function ChildDashboard({ identifier, token }) {
 
       {view === 'chat' && (
         <div className="h-[600px] rounded-2xl border border-slate-800 overflow-hidden">
-          {loadingChat ? (
-            <div className="h-full flex items-center justify-center bg-slate-900/50">
-              <div className="text-center">
-                <div className="text-6xl mb-4 animate-pulse">✨</div>
-                <p className="text-slate-300 mb-2 text-lg">Loading Sparkle...</p>
-                <p className="text-slate-400 text-sm">Setting up your chat</p>
-              </div>
-            </div>
-          ) : chatToken ? (
-            <Chat token={chatToken} />
-          ) : (
-            <div className="h-full flex items-center justify-center bg-slate-900/50">
-              <div className="text-center">
-                <div className="text-6xl mb-4">✨</div>
-                <p className="text-slate-300 mb-2 text-lg">Welcome to Sparkle!</p>
-                <p className="text-slate-400 text-sm">Initializing chat...</p>
-              </div>
-            </div>
-          )}
+          <Chat token={chatToken} />
         </div>
       )}
 
@@ -201,31 +158,8 @@ function ChildDashboard({ identifier, token }) {
 
 function ParentDashboard({ identifier, token }) {
   const [sosAlert, setSosAlert] = useState(null)
-  const [chatToken, setChatToken] = useState(token)
-  const [loadingChat, setLoadingChat] = useState(false)
-
-  // Auto-authenticate for parents/teachers
-  useEffect(() => {
-    if (!chatToken && !loadingChat) {
-      setLoadingChat(true)
-      axios.post('http://localhost:5001/api/auth/auto-login', {
-        identifier: identifier,
-        role: 'parent',
-        email: identifier,
-        fullName: identifier.split('@')[0]
-      })
-      .then(response => {
-        const token = response.data.token
-        setChatToken(token)
-        localStorage.setItem('chatToken', token)
-        setLoadingChat(false)
-      })
-      .catch(error => {
-        console.error('Auto-login failed:', error)
-        setLoadingChat(false)
-      })
-    }
-  }, [identifier]) // Removed chatToken and loadingChat from dependencies to prevent infinite loop
+  // Chat no longer requires authentication - token is optional
+  const chatToken = token || null
 
   const handleSOSAlert = (alert) => {
     setSosAlert(alert)
@@ -278,31 +212,8 @@ function ParentDashboard({ identifier, token }) {
 
 function TeacherDashboard({ identifier, token }) {
   const [sosAlert, setSosAlert] = useState(null)
-  const [chatToken, setChatToken] = useState(token)
-  const [loadingChat, setLoadingChat] = useState(false)
-
-  // Auto-authenticate for teachers
-  useEffect(() => {
-    if (!chatToken && !loadingChat) {
-      setLoadingChat(true)
-      axios.post('http://localhost:5001/api/auth/auto-login', {
-        identifier: identifier,
-        role: 'teacher',
-        email: identifier,
-        fullName: identifier.split('@')[0]
-      })
-      .then(response => {
-        const token = response.data.token
-        setChatToken(token)
-        localStorage.setItem('chatToken', token)
-        setLoadingChat(false)
-      })
-      .catch(error => {
-        console.error('Auto-login failed:', error)
-        setLoadingChat(false)
-      })
-    }
-  }, [identifier]) // Removed chatToken and loadingChat from dependencies to prevent infinite loop
+  // Chat no longer requires authentication - token is optional
+  const chatToken = token || null
 
   const handleSOSAlert = (alert) => {
     setSosAlert(alert)

@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/chat': {
-        target: 'http://localhost:5001',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
       '/api/auth': {

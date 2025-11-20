@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j-p^h+rynv!*rgkt*utrg^(4*o(gun6-lvkz!0qb07ig*d+n7_'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-j-p^h+rynv!*rgkt*utrg^(4*o(gun6-lvkz!0qb07ig*d+n7_')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
+
+# Gemini API Configuration
+GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+GEMINI_MODEL = config('GEMINI_MODEL', default='gemini-pro')
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 

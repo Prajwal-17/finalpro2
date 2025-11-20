@@ -75,7 +75,7 @@ function Home() {
     async function loadArticles() {
       try {
         // TODO: Replace with real endpoint once backend is available.
-        const data = await fetchJson('/api/articles?limit=3')
+        const data = await fetchJson('/api/news')
         if (!cancelled && Array.isArray(data)) {
           setArticles(data)
         }

@@ -1,17 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { detectEmotion, getEmotionIcon, getEmotionColor } from '../utils/emotionDetection';
+import { useEffect, useRef, useState } from 'react';
+import { detectEmotion, getEmotionColor, getEmotionIcon } from '../utils/emotionDetection';
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = 'http://localhost:8000/api';
 
-function Chat({ token, onSOSTrigger }) {
+function Chat({ token }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState({ emotion: 'neutral', level: 0 });
-  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
-  const recognitionRef = useRef(null);
 
   useEffect(() => {
     scrollToBottom();
@@ -53,15 +51,19 @@ function Chat({ token, onSOSTrigger }) {
     setMessages(prev => [...prev, newUserMessage]);
 
     try {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Only add Authorization header if token is provided
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await axios.post(
         `${API_BASE}/chat/send`,
         { message: userMessage },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
+        { headers }
       );
 
       // Add AI response to UI
@@ -80,9 +82,26 @@ function Chat({ token, onSOSTrigger }) {
       }
     } catch (error) {
       console.error('Chat error:', error);
+      let errorMsg = 'Sorry, I had trouble understanding that. Please try again.';
+      
+      if (error.response) {
+        // Server responded with error
+        const serverError = error.response.data?.error || error.response.data?.details;
+        if (serverError) {
+          errorMsg = `Error: ${serverError}`;
+        } else {
+          errorMsg = `Server error: ${error.response.status} ${error.response.statusText}`;
+        }
+      } else if (error.request) {
+        // Request made but no response
+        errorMsg = 'Unable to connect to server. Please check if Django backend is running on port 8000.';
+      } else {
+        errorMsg = `Error: ${error.message}`;
+      }
+      
       const errorMessage = {
         role: 'model',
-        content: 'Sorry, I had trouble understanding that. Please try again or use the SOS button if you need help.',
+        content: errorMsg,
         timestamp: new Date(),
         isError: true
       };
@@ -92,55 +111,6 @@ function Chat({ token, onSOSTrigger }) {
     }
   };
 
-  const startVoiceInput = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in your browser.');
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map(result => result[0].transcript)
-        .join('');
-      
-      setInput(transcript);
-      
-      if (event.results[event.results.length - 1].isFinal) {
-        setIsListening(false);
-        recognition.stop();
-      }
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.start();
-    recognitionRef.current = recognition;
-  };
-
-  const stopVoiceInput = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    }
-  };
 
   return (
     <div className="flex flex-col h-full bg-slate-950">
@@ -222,19 +192,6 @@ function Chat({ token, onSOSTrigger }) {
               </div>
             )}
           </div>
-          
-          <button
-            type="button"
-            onClick={isListening ? stopVoiceInput : startVoiceInput}
-            className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
-              isListening
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
-            }`}
-            title="Talk to Sparkle"
-          >
-            {isListening ? '🛑' : '🎤'}
-          </button>
           
           <button
             type="submit"

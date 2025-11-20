@@ -15,5 +15,6 @@ urlpatterns = [
     path('quiz/submit', views.quiz_submit_answer, name='quiz-submit'),
     path('quiz/complete', views.quiz_complete, name='quiz-complete'),
     path('quiz/progress', views.quiz_progress, name='quiz-progress'),
+    path('chat/send', views.chat_send, name='chat-send'),
 ]
 
